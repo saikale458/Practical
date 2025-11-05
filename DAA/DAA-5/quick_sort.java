@@ -1,106 +1,90 @@
-import java.util.*;
+// determinstic
+public class QuickSortDeterministic {
 
-public class QuickSort {
-    private int[] array;
-
-    // Constructor
-    public QuickSort(int[] array) {
-        this.array = array;
-    }
-
-    // Deterministic partition method (last element as pivot)
-    private int partition(int low, int high) {
-        int pivot = array[high];
+    // Lomuto partition
+    private static int partition(int[] a, int low, int high) {
+        int pivot = a[high];    // pivot as last element
         int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            if (array[j] <= pivot) {
+        for (int j = low; j <= high - 1; j++) {
+            if (a[j] <= pivot) {
                 i++;
-                // Swap array[i] and array[j]
-                int temp = array[i];
-                array[i] = array[j];
-                array[j] = temp;
+                swap(a, i, j);
             }
         }
-
-        // Swap pivot to correct position
-        int temp = array[i + 1];
-        array[i + 1] = array[high];
-        array[high] = temp;
-
+        swap(a, i + 1, high);
         return i + 1;
     }
 
-    // Randomized partition method
-    private int partitionRandom(int low, int high) {
-        Random rand = new Random();
-        int pivotIndex = rand.nextInt(high - low + 1) + low;
-
-        // Swap pivot with last element
-        int temp = array[pivotIndex];
-        array[pivotIndex] = array[high];
-        array[high] = temp;
-
-        return partition(low, high);
-    }
-
-    // Deterministic quicksort
-    public void sortDeterministic(int low, int high) {
+    private static void quickSort(int[] a, int low, int high) {
         if (low < high) {
-            int pivot = partition(low, high);
-            sortDeterministic(low, pivot - 1);
-            sortDeterministic(pivot + 1, high);
+            int pi = partition(a, low, high);
+            quickSort(a, low, pi - 1);
+            quickSort(a, pi + 1, high);
         }
     }
 
-    // Randomized quicksort
-    public void sortRandomized(int low, int high) {
-        if (low < high) {
-            int pivot = partitionRandom(low, high);
-            sortRandomized(low, pivot - 1);
-            sortRandomized(pivot + 1, high);
-        }
+    private static void swap(int[] a, int i, int j) {
+        int tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
     }
 
-    // Utility method to print array
-    public void printArray() {
-        System.out.println(Arrays.toString(array));
-    }
-
-    // Main method
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        try {
-            while (true) {
-                System.out.println("Press Ctrl + C to exit...");
-                System.out.print("Enter array elements (space-separated): ");
-                String[] input = sc.nextLine().trim().split(" ");
-                int[] arr = new int[input.length];
-                for (int i = 0; i < input.length; i++) {
-                    arr[i] = Integer.parseInt(input[i]);
-                }
-
-                // Deterministic QuickSort
-                System.out.println("Deterministic variant of sort:");
-                int[] arrDet = Arrays.copyOf(arr, arr.length);
-                QuickSort sort1 = new QuickSort(arrDet);
-                sort1.sortDeterministic(0, arrDet.length - 1);
-                sort1.printArray();
-
-                // Randomized QuickSort
-                System.out.println("Randomized variant of sort:");
-                int[] arrRand = Arrays.copyOf(arr, arr.length);
-                QuickSort sort2 = new QuickSort(arrRand);
-                sort2.sortRandomized(0, arrRand.length - 1);
-                sort2.printArray();
-
-                System.out.println();
-            }
-        } catch (Exception e) {
-            System.out.println("Program terminated.");
-        }
-
-        sc.close();
+        int[] arr = {10, 80, 30, 90, 40, 50, 70};
+        quickSort(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr));
     }
 }
+
+
+
+import java.util.Random;
+import java.util.Arrays;
+
+public class QuickSortRandomized {
+
+    private static final Random rnd = new Random();
+
+    // Randomized partition: pick random pivot and swap with high
+    private static int randomizedPartition(int[] a, int low, int high) {
+        int pivotIndex = low + rnd.nextInt(high - low + 1);
+        swap(a, pivotIndex, high);
+        return partition(a, low, high);
+    }
+
+    private static int partition(int[] a, int low, int high) {
+        int pivot = a[high];
+        int i = low - 1;
+        for (int j = low; j <= high - 1; j++) {
+            if (a[j] <= pivot) {
+                i++;
+                swap(a, i, j);
+            }
+        }
+        swap(a, i + 1, high);
+        return i + 1;
+    }
+
+    private static void quickSortRand(int[] a, int low, int high) {
+        if (low < high) {
+            int pi = randomizedPartition(a, low, high);
+            quickSortRand(a, low, pi - 1);
+            quickSortRand(a, pi + 1, high);
+        }
+    }
+
+    private static void swap(int[] a, int i, int j) {
+        int tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {10, 80, 30, 90, 40, 50, 70};
+        quickSortRand(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr));
+    }
+}
+
+
+
