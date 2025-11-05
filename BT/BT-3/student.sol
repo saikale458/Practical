@@ -1,48 +1,35 @@
-//SPDX-License-Identifier: MIT 
+//SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-// Build the Contract
-contract StudentData
-{
-	// Create a structure for
-	// student details
-	struct Student
-	{
-		int ID;
-		string fName;
-		string lName;
-		int[2] marks;
-	}
-	// fallback () external payable {
-		
-	//  }
+contract StudentData{
+    struct Student{
+        string name;
+        uint rollno;
+    }
 
-	address owner;
-	int public stdCount = 0;
-	mapping(int => Student) public stdRecords;
+    Student[] public studentArr;
 
-	modifier onlyOwner
-	{
-		require(owner == msg.sender);
-		_;
-	}
-	constructor()
-	{
-		owner=msg.sender;
-	}
+    function addStudent(string memory name,uint rollno) public{
+        for(uint i=0;i<studentArr.length;i++){
+            if(studentArr[i].rollno==rollno){
+                revert("Student with roll no already exists!");
+            }
+        }
+        studentArr.push(Student(name,rollno));
+    }
 
-	// Create a function to add
-	// the new records
-	function addNewRecords(int _ID,string memory _fName,string memory _lName,int[2] memory _marks) public onlyOwner
-	{
-		// Increase the count by 1
-		stdCount = stdCount + 1;
+    function displayAllStudents() public view returns(Student[] memory){
+        return studentArr;
+    }
 
-		// Fetch the student details
-		// with the help of stdCount
-		stdRecords[stdCount] = Student(_ID, _fName,_lName, _marks);
-	}
+    function getStudentByIndex(uint index) public view returns(Student memory){
+        require(index<studentArr.length || index > studentArr.length,"Index out of bound");
+        return studentArr[index];
+    }
+
+    function getLengthOfStudents() public view returns(uint){
+        return studentArr.length;
+    }
+
 
 }
-
-
