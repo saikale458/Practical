@@ -1,113 +1,67 @@
-import java.util.Scanner;
-
 public class NQueens {
-    private int size;
-    private boolean[][] board;
-    private int count;
 
-    // Constructor
-    public NQueens() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter size of chessboard: ");
-        this.size = sc.nextInt();
-        this.board = new boolean[size][size];
-        this.count = 0;
-    }
+    static int N = 4; // you can change for any N
 
-    // Print the board
-    private void printBoard() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                System.out.print(board[i][j] ? "Q " : "X ");
-            }
+    // Function to print board
+    static void printBoard(int board[][]) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++)
+                System.out.print(board[i][j] + " ");
             System.out.println();
         }
         System.out.println();
     }
 
-    // Check if placing a queen at (row, col) is safe
-    private boolean isSafe(int row, int col) {
-        // Check column
-        for (int i = 0; i < size; i++) {
-            if (board[i][col]) return false;
-        }
+    // Function to check if placing queen is safe
+    static boolean isSafe(int board[][], int row, int col) {
+        int i, j;
 
-        // Check backward slash (\) diagonal - upward
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j]) return false;
-        }
+        // Check this column on upper side
+        for (i = 0; i < row; i++)
+            if (board[i][col] == 1)
+                return false;
 
-        // Check backward slash (\) diagonal - downward
-        for (int i = row, j = col; i < size && j < size; i++, j++) {
-            if (board[i][j]) return false;
-        }
+        // Check upper-left diagonal
+        for (i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--)
+            if (board[i][j] == 1)
+                return false;
 
-        // Check forward slash (/) diagonal - upward
-        for (int i = row, j = col; i >= 0 && j < size; i--, j++) {
-            if (board[i][j]) return false;
-        }
-
-        // Check forward slash (/) diagonal - downward
-        for (int i = row, j = col; i < size && j >= 0; i++, j--) {
-            if (board[i][j]) return false;
-        }
+        // Check upper-right diagonal
+        for (i = row - 1, j = col + 1; i >= 0 && j < N; i--, j++)
+            if (board[i][j] == 1)
+                return false;
 
         return true;
     }
 
-    // Set the first queen manually
-    private void setPositionFirstQueen(Scanner sc) {
-        System.out.println("Enter coordinates of first queen: ");
-        System.out.print("Enter row (1-" + size + "): ");
-        int row = sc.nextInt();
-        System.out.print("Enter column (1-" + size + "): ");
-        int col = sc.nextInt();
-
-        board[row - 1][col - 1] = true;
-        printBoard();
-    }
-
-    // Recursive function to solve the N-Queens problem
-    private void solve(int row) {
-        if (row == size) {
-            count++;
-            printBoard();
-            return;
+    // Solve N-Queen using recursion & backtracking
+    static boolean solveNQ(int board[][], int row) {
+        // Base case: all queens placed
+        if (row == N) {
+            printBoard(board);
+            return true;
         }
 
-        // If there's already a queen in this row, skip to next
-        for (int col = 0; col < size; col++) {
-            if (board[row][col]) {
-                solve(row + 1);
-                return;
+        boolean res = false;
+
+        // Try placing queen in all columns of this row
+        for (int col = 0; col < N; col++) {
+            if (isSafe(board, row, col)) {
+                board[row][col] = 1; // Place queen
+
+                // Recurse for next row
+                res = solveNQ(board, row + 1) || res;
+
+                // Backtrack
+                board[row][col] = 0;
             }
         }
-
-        // Try placing a queen in each column
-        for (int col = 0; col < size; col++) {
-            if (isSafe(row, col)) {
-                board[row][col] = true;
-                solve(row + 1);
-                board[row][col] = false;
-            }
-        }
+        return res;
     }
 
-    // Display final message
-    private void displayMessage() {
-        if (count > 0)
-            System.out.println("Solution exists for the given position of the queen.");
-        else
-            System.out.println("Solution doesn't exist for the given position of the queen.");
-    }
-
-    // Main method
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        NQueens solver = new NQueens();
-        solver.setPositionFirstQueen(sc);
-        solver.solve(0);
-        solver.displayMessage();
-        sc.close();
+        int[][] board = new int[N][N];
+        if (!solveNQ(board, 0))
+            System.out.println("No solution exists");
     }
 }
